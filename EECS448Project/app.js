@@ -7,7 +7,7 @@ app.use('/css', express.static(__dirname + '/css'));
 
 //Get homepage and send it to whoever is requesting the page.
 app.get('/', function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "homepage.html");
+    res.sendFile(__dirname + "/Pages/" + "LocalBarMap.html");
 });
 
 //Get owner page and send it to whoever is requesting the page.
