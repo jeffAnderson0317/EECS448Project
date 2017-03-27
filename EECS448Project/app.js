@@ -5,6 +5,7 @@ var bodyParser = require("body-parser");
 app.use('/images', express.static(__dirname + '/images'));
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
+app.use('/font', express.static(__dirname + '/font'));
 app.use(bodyParser.json());                         //Support JSON-Encoded bodies
 app.use(bodyParser.urlencoded({extended: true}));   //Support URL-Encoded Bodies
 
@@ -39,11 +40,13 @@ app.get('/Login',function(req,res){
 });
 
 app.post('/login', function(req, res){
-    var username = req.body.user.name;
+    var username = req.body.username;
+    res.send("Okay");
 });
 
 app.post('/signup', function(req, res){
     var username = req.body.username;
+    res.send("Okay");
 });
 
 //Get listen for any requests on port 3000.

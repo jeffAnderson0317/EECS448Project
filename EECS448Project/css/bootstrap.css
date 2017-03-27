@@ -2653,8 +2653,11 @@ input[type="search"] {
 	position: absolute;
 	margin-top: 4px \9;
 	margin-left: -20px;
-	width: 115px;
-	left: 209px;
+	width: auto;
+	left: 367px;
+	top: 8px;
+	background-color: #AD5153;
+	overflow: visible;
 }
 .radio + .radio,
 .checkbox + .checkbox {

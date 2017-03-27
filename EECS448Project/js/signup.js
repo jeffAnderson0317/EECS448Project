@@ -1,5 +1,5 @@
 function SubmitForm(){
-    var user = [];
+    var user = {};
     user.username = $('#username').val();
     user.firstname = $('#firstname').val();
     user.lastname = $('#lastname').val();
@@ -9,8 +9,8 @@ function SubmitForm(){
     user.isOwner = $('#owner').is(':checked');
     var fieldsFilled = true;
 
-    user.forEach(function(field){
-        if(field == "" && field != null)
+    $.each(user, function(){
+        if(this.toString() == "" && this.toString() != null)
             fieldsFilled = false;
     });
     
