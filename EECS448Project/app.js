@@ -1,9 +1,12 @@
 var express = require("express");
 var app = express();
+var bodyParser = require("body-parser");
 
 app.use('/images', express.static(__dirname + '/images'));
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
+app.use(bodyParser.json());                         //Support JSON-Encoded bodies
+app.use(bodyParser.urlencoded({extended: true}));   //Support URL-Encoded Bodies
 
 //Get homepage and send it to whoever is requesting the page.
 app.get('/', function(req,res){
@@ -35,6 +38,13 @@ app.get('/Login',function(req,res){
     res.sendFile(__dirname + "/Pages/" + "LoginSystem.html");
 });
 
+app.post('/login', function(req, res){
+    var username = req.body.user.name;
+});
+
+app.post('/signup', function(req, res){
+    var username = req.body.username;
+});
 
 //Get listen for any requests on port 3000.
 app.listen(3000, function(){
