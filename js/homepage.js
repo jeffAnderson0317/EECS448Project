@@ -1,12 +1,12 @@
 var username = GetCookie("username");
 
 if (username == ""){
-    window.location.replace("http://localhost:3000/LoginGateway");
+    window.location.replace("/LoginGateway");
 }
 else {
     var isOwner = GetCookie("isowner")
     if (isOwner == ""){
-        window.location.replace("http://localhost:3000/BarOwnerPage");
+        window.location.replace("/BarOwnerPage");
     }
 }
 
