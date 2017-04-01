@@ -50,6 +50,4 @@ app.post('/signup', function(req, res){
 });
 
 //Get listen for any requests on port 3000.
-app.listen(3000, function(){
-    console.log('EECS 448 project app listening on port 3000');
-})
+app.listen(process.env.PORT || 5000);
