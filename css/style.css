@@ -1,8 +1,6 @@
-/*
-
 @font-face{
 	font-family: Jim Nightshade;
-	src: url(../fonts/JimNightshade-Regular.ttf);
+	src: url(/fonts/JimNightshade-Regular.ttf);
 }
 
 body *
@@ -75,4 +73,3 @@ h1{
 	background-color: black;
 	opacity:.95;
 }
-*/

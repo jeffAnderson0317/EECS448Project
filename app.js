@@ -5,7 +5,7 @@ var bodyParser = require("body-parser");
 app.use('/images', express.static(__dirname + '/images'));
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
-app.use('/font', express.static(__dirname + '/font'));
+app.use('/fonts', express.static(__dirname + '/fonts'));
 app.use(bodyParser.json());                         //Support JSON-Encoded bodies
 app.use(bodyParser.urlencoded({extended: true}));   //Support URL-Encoded Bodies
 
@@ -50,4 +50,4 @@ app.post('/signup', function(req, res){
 });
 
 //Get listen for any requests on port 3000.
-app.listen(process.env.PORT || 5000);
+app.listen(process.env.PORT || 3000);
