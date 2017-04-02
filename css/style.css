@@ -10,7 +10,7 @@ body *
 }
 
 body {
-	background: url('/css/winery.jpg');
+	background: url('/images/winery.jpg');
 	background-color: burlywood;
 	background-repeat: repeat;
 	background-position: top left;
