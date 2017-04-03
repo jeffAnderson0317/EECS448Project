@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign Up!</title>
+   	<link href="/css/bootstrap.css" rel="stylesheet">
+		<link href="/css/style.css" rel="stylesheet" type="text/css">
+
+  </head>
+  <body>
+	<script src="js/jquery-1.11.3.min.js"></script>
+	<script src="js/tether.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/signup.js"></script>
+
+	<div class="container-fluid">
+		
+		<form onsubmit="SubmitForm()">
+	  <div class="form-group">
+	    <label for="username">Username:</label>
+	    <input type="text" class="form-control" id="username" placeholder="Username">
+      </div>
+      <div class="form-group">
+	    <label for="firstname">First Name:</label>
+	    <input type="text" class="form-control" id="firstname" placeholder="First Name">
+      </div>
+      <div class="form-group">
+	    <label for="lastname">Last Name:</label>
+	    <input type="text" class="form-control" id="lastname" placeholder="Last Name">
+      </div>
+      <div class="form-group">
+	    <label for="age">Age:</label>
+	    <input type="text" class="form-control" id="age" placeholder="Age">
+      </div>
+	  <div class="form-group">
+	    <label for="email">Email Address:</label>
+	    <input type="email" class="form-control" id="email" placeholder="Email Address">
+      </div>
+	  <div class="form-group">
+	    <label for="password">Password:</label>
+	    <input type="password" class="form-control" id="password" placeholder="Password">
+      </div>
+	  <div class="checkbox">
+	    <label>
+        Are you a bar owner? </label>
+	    <input type="checkbox">
+	  </div>
+	  <button type="submit" class="btn btn-group-justified btn-block btn-lg">Create Account</button>
+  </form>
+	</div>  
+</body>
+</html>

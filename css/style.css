@@ -1,0 +1,75 @@
+@font-face{
+	font-family: Jim Nightshade;
+	src: url(/fonts/JimNightshade-Regular.ttf);
+}
+
+body *
+{
+	font-family: Jim Nightshade !important;
+	font-size: 1.1em !important;
+}
+
+body {
+	background: url('/images/winery.jpg');
+	background-color: burlywood;
+	background-repeat: repeat;
+	background-position: top left;
+	background-attachment: fixed;
+	background-size: cover;
+	background-blend-mode: luminosity;
+	overflow-x: auto; 
+	overflow-y: auto;
+	letter-spacing: .6em;
+}
+
+label{
+	background-color: aliceblue;
+	opacity: .9;
+	padding: 10px;
+	margin:auto;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
+h1{
+	background-color: lavender;
+	opacity: .9;
+	padding: 10px;
+	margin:auto;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
+.checkbox{
+	background-color: lavender;
+	opacity: .9;
+	border-radius: 10px;
+	align-content: space-between;
+	font-weight: bolder;
+	display: inline-block;
+}
+
+.btn{
+	color: coral;
+	background-color: blanchedalmond;
+}
+
+.form-control{
+	color: darkred;
+	background-color: honeydew;
+}
+
+.help-block{
+	background-color: black;
+	color: antiquewhite;
+	opacity: .9;
+	width: 50%;
+	border-radius: 10px;
+	align-content: center;
+	font-weight: bolder;
+}
+
+.jumbotron{
+	background-color: black;
+	opacity:.95;
+}
