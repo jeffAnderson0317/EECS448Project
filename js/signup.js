@@ -21,12 +21,11 @@ function SubmitForm(){
             data: user,
             dataType: "json",
             success: function (result) {
-                    },
+                    alert("Successfully logged in");
+            },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
-            }
-            });
+                alert("Could not log in");
+            }});
     }
     else{
         alert("Required fields incorrectly filled out.");

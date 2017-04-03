@@ -11,10 +11,10 @@ function SubmitForm(){
             data: user,
             dataType: "json",
             success: function (result) {
-                    },
+                alert("You have signed up!");
+            },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
+                alert("Could not sign up correctly");
             }
         });
     }
