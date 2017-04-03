@@ -41,12 +41,12 @@ app.get('/Login',function(req,res){
 
 app.post('/login', function(req, res){
     var username = req.body.username;
-    res.send("Okay");
+    res.send('{"msg": "Okay"}');
 });
 
 app.post('/signup', function(req, res){
     var username = req.body.username;
-    res.send("Okay");
+    res.send('{"msg": "Okay"}');
 });
 
 //Get listen for any requests on port 3000.
