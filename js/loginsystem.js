@@ -6,19 +6,20 @@ function SubmitForm(){
 
     if (user.username != ""){
         $.ajax({
-            url: "login",
+            url: "auth",
             type: "POST",
             data: user,
             dataType: "json",
             success: function (result) {
-                alert("You have signed up!");
+                alert("You have logged in successfully!");
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert("Could not sign up correctly");
+                alert("Error when logging in.");
             }
         });
     }
     else{
         alert("Username and password fields were left blank.");
     }
+    return false;
 }

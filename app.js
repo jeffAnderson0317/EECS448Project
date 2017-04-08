@@ -1,7 +1,22 @@
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
+var mysql       = require('mysql');
+var bcrypt      = require('./js/bcrypt.js');
 
+//Set up the connection to the database
+var connection = mysql.createConnection({
+  host     : 'mysql.eecs.ku.edu',
+  user     : 'rcheruiy',
+  password : 'drow1',
+  database : 'rcheruiy'
+});
+
+//Connect to the database
+connection.connect();
+
+//Create allow public access to images, js, css, and font files.
+//Also support JSON/URL-Encoded bodies
 app.use('/images', express.static(__dirname + '/images'));
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
@@ -39,14 +54,50 @@ app.get('/Login',function(req,res){
     res.sendFile(__dirname + "/Pages/" + "LoginSystem.html");
 });
 
-app.post('/login', function(req, res){
+//Verify user and log them in.
+app.post('/auth', function(req, res){
     var username = req.body.username;
-    res.send('{"msg": "Okay"}');
+    var password = req.body.password;
+    
+    var hash = bcrypt.cryptPassword(password,function(err,hash){
+        bcrypt.comparePassword(password, hash, function(err, isPasswordMatch){
+            if(err){
+                res.send('{"isValid": "false"}');    
+            }
+            else if(isPasswordMatch){
+                res.send('{"isValid": "true"}');
+            }
+            else{
+                res.send('{"isValid": "false"}');
+            }
+        });
+    });
 });
 
+//Sign up the user and store them into the database.
 app.post('/signup', function(req, res){
-    var username = req.body.username;
-    res.send('{"msg": "Okay"}');
+    var fields = req.body;
+
+    bcrypt.cryptPassword(fields.password, function(err, hash){
+        if (err){
+            res.send('{"msg": "Error signing up. Please contact j714a273@ku.edu for assistance.');
+        }
+        else{
+            var user = {username: fields.username, firstname: fields.firstname, lastname: fields.lastname, age: fields.age, email: fields.email, password: hash, isOwner: fields.isOwner };
+
+            connection.query("INSERT INTO BarUsers SET ?", user, function (error, results, fields) {
+                if (error){
+                    if(error.code == "ER_DUP_ENTRY")
+                        res.send('{"msg": "User already exists"}');
+                    else
+                        res.send('{"msg": "Error connecting to database."}');
+                } 
+                else {
+                    res.send('{"msg": "Successfully signed up"}');
+                }
+            });
+        }
+    });
 });
 
 //Get listen for any requests on port 3000.

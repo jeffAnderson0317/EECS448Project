@@ -21,15 +21,17 @@ function SubmitForm(){
             data: user,
             dataType: "json",
             success: function (result) {
-                    alert("Successfully logged in");
+                    alert(result.msg);
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert("Could not log in");
+                alert("Error when signing up. Please try again.");
             }});
     }
     else{
         alert("Required fields incorrectly filled out.");
     }
+    
+    return false;
 }
 
 function validateEmail(email) {
