@@ -4,6 +4,7 @@ var bodyParser  = require("body-parser");
 var mysql       = require('mysql');
 var bcrypt      = require('./js/bcrypt.js');
 var helmet      = require('helmet');
+var session     = require('express-session');
 
 //Set up the connection to the database
 var connection = mysql.createConnection({
@@ -25,9 +26,26 @@ app.use('/fonts', express.static(__dirname + '/fonts'));
 app.use(bodyParser.json());                                 //Support JSON-Encoded bodies
 app.use(bodyParser.urlencoded({extended: true}));           //Support URL-Encoded Bodies
 app.use(helmet());                                          //Protext app from well known vulerabilities (https://expressjs.com/en/advanced/best-practice-security.html)
+app.use(session({
+  resave: false, // don't save session if unmodified
+  saveUninitialized: false, // don't create session until something stored
+  secret: 'shhhh, very secret'
+}));
+
+//Session-persisted message middleware
+app.use(function(req, res, next){
+    var err = req.session.error;
+    var msg = req.session.success;
+    delete req.session.error;
+    delete req.session.success;
+    res.locals.message = '';
+    if (err) res.locals.message = '<p class="msg error">' + err + '</p>';
+    if (msg) res.locals.message = '<p class="msg success">' + msg + '</p>';
+    next();
+});
 
 //Get homepage and send it to whoever is requesting the page.
-app.get('/', function(req,res){
+app.get('/', restrict, function(req,res){
     res.sendFile(__dirname + "/Pages/" + "LocalBarMap.html");
 });
 
@@ -52,16 +70,26 @@ app.get('/SignUp',function(req,res){
 });
 
 //Get login system and send it to whoever is requesting the page.
-app.get('/Login',function(req,res){
+app.get('/Login', function(req,res){
     res.sendFile(__dirname + "/Pages/" + "LoginSystem.html");
+});
+
+app.get('/logout', function(req, res){
+  // destroy the user's session to log them out
+  // will be re-created next request
+  req.session.destroy(function(){
+    res.redirect('/LoginGateway');
+  });
 });
 
 //Verify user and log them in.
 app.post('/auth', function(req, res){
     var username = req.body.username;
     var password = req.body.password;
+
+    req.session.user = 2;
     
-    connection.query("SELECT password FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
+    connection.query("SELECT * FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
         if (error){
             res.send('{"msg": "Error logging in.", "auth": "false"}');
         } 
@@ -71,7 +99,16 @@ app.post('/auth', function(req, res){
                     res.send('{"isValid": "false"}');    
                 }
                 else if(isPasswordMatch){
-                    res.send('{"isValid": "true"}');
+                    req.session.regenerate(function(){
+                        // Store the user's primary key
+                        // in the session store to be retrieved,
+                        // or in this case the entire user object
+                        req.session.user = results[0];
+                        req.session.success = 'Authenticated as ' + results[0].username
+                            + ' click to <a href="/logout">logout</a>. '
+                            + ' You may now access <a href="/restricted">/restricted</a>.';
+                        res.send('{"isValid": "true"}');
+                    });
                 }
                 else{
                     res.send('{"isValid": "false"}');
@@ -100,13 +137,32 @@ app.post('/signup', function(req, res){
                         res.send('{"msg": "Error connecting to database.", "isSignedUp": "false"}');
                 } 
                 else {
-                    res.send('{"msg": "Successfully signed up", "isSignedUp": "true"}');
+                    req.session.regenerate(function(){
+                        // Store the user's primary key
+                        // in the session store to be retrieved,
+                        // or in this case the entire user object
+                        req.session.user = user;
+                        req.session.success = 'Authenticated as ' + user.username
+                            + ' click to <a href="/logout">logout</a>. '
+                            + ' You may now access <a href="/restricted">/restricted</a>.';
+                        res.send('{"msg": "Successfully signed up", "isSignedUp": "true"}');
+                    });
                 }
             });
         }
     });
 });
 
+//Check if user logged in otherwise redirect them to the login page.
+function restrict(req, res, next) {
+  if (req.session.user) {
+    console.log(req.session.user);
+    next();
+  } else {
+    console.log("User not found");
+    next();
+  }
+}
 
 process.stdin.resume();//so the program will not close instantly
 
