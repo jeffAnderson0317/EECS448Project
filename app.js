@@ -107,5 +107,24 @@ app.post('/signup', function(req, res){
     });
 });
 
+
+process.stdin.resume();//so the program will not close instantly
+
+function exitHandler(options, err) {
+    connection.close();
+    if (options.cleanup) console.log('clean');
+    if (err) console.log(err.stack);
+    if (options.exit) process.exit();
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
+
 //Get listen for any requests on port 3000.
 app.listen(process.env.PORT || 3000);
