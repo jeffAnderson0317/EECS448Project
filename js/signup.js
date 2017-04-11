@@ -21,10 +21,22 @@ function SubmitForm(){
             data: user,
             dataType: "json",
             success: function (result) {
-                    alert(result.msg);
+                    if (result.isSignedUp == "true"){
+                        if(user.isOwner)
+                            window.location.assign('/owner');
+                        else{
+                            window.location.assign('/')
+                        }
+                    }
+                    else{
+                        if (result.msg == "User already exists.")
+                            alert("Username already exists! Please use a different username.");
+                        else
+                            alert("Error signing up. Please contact j714a273@ku.edu for support (Database error).");
+                    }
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert("Error when signing up. Please try again.");
+                alert("Error signing up. Please contact j714a273@ku.edu for support (Server error).");
             }});
     }
     else{

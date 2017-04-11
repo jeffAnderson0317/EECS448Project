@@ -11,7 +11,10 @@ function SubmitForm(){
             data: user,
             dataType: "json",
             success: function (result) {
-                alert("You have logged in successfully!");
+                if(result.isValid == "true")
+                    window.location.assign('/');
+                else
+                    alert("Incorrect password! Please try again.");
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert("Error when logging in.");

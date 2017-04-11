@@ -1,8 +1,9 @@
-var express = require("express");
-var app = express();
-var bodyParser = require("body-parser");
+var express     = require("express");
+var app         = express();
+var bodyParser  = require("body-parser");
 var mysql       = require('mysql');
 var bcrypt      = require('./js/bcrypt.js');
+var helmet      = require('helmet');
 
 //Set up the connection to the database
 var connection = mysql.createConnection({
@@ -21,8 +22,9 @@ app.use('/images', express.static(__dirname + '/images'));
 app.use('/js', express.static(__dirname + '/js'));
 app.use('/css', express.static(__dirname + '/css'));
 app.use('/fonts', express.static(__dirname + '/fonts'));
-app.use(bodyParser.json());                         //Support JSON-Encoded bodies
-app.use(bodyParser.urlencoded({extended: true}));   //Support URL-Encoded Bodies
+app.use(bodyParser.json());                                 //Support JSON-Encoded bodies
+app.use(bodyParser.urlencoded({extended: true}));           //Support URL-Encoded Bodies
+app.use(helmet());                                          //Protext app from well known vulerabilities (https://expressjs.com/en/advanced/best-practice-security.html)
 
 //Get homepage and send it to whoever is requesting the page.
 app.get('/', function(req,res){
@@ -59,18 +61,23 @@ app.post('/auth', function(req, res){
     var username = req.body.username;
     var password = req.body.password;
     
-    var hash = bcrypt.cryptPassword(password,function(err,hash){
-        bcrypt.comparePassword(password, hash, function(err, isPasswordMatch){
-            if(err){
-                res.send('{"isValid": "false"}');    
-            }
-            else if(isPasswordMatch){
-                res.send('{"isValid": "true"}');
-            }
-            else{
-                res.send('{"isValid": "false"}');
-            }
-        });
+    connection.query("SELECT password FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
+        if (error){
+            res.send('{"msg": "Error logging in.", "auth": "false"}');
+        } 
+        else {
+            bcrypt.comparePassword(password, results[0].password, function(err, isPasswordMatch){
+                if(err){
+                    res.send('{"isValid": "false"}');    
+                }
+                else if(isPasswordMatch){
+                    res.send('{"isValid": "true"}');
+                }
+                else{
+                    res.send('{"isValid": "false"}');
+                }
+            });
+        }
     });
 });
 
@@ -88,12 +95,12 @@ app.post('/signup', function(req, res){
             connection.query("INSERT INTO BarUsers SET ?", user, function (error, results, fields) {
                 if (error){
                     if(error.code == "ER_DUP_ENTRY")
-                        res.send('{"msg": "User already exists"}');
+                        res.send('{"msg": "User already exists.", "isSignedUp": "false"}');
                     else
-                        res.send('{"msg": "Error connecting to database."}');
+                        res.send('{"msg": "Error connecting to database.", "isSignedUp": "false"}');
                 } 
                 else {
-                    res.send('{"msg": "Successfully signed up"}');
+                    res.send('{"msg": "Successfully signed up", "isSignedUp": "true"}');
                 }
             });
         }
