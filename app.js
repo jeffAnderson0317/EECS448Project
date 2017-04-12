@@ -86,8 +86,6 @@ app.get('/logout', function(req, res){
 app.post('/auth', function(req, res){
     var username = req.body.username;
     var password = req.body.password;
-
-    req.session.user = 2;
     
     connection.query("SELECT * FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
         if (error){
@@ -156,11 +154,9 @@ app.post('/signup', function(req, res){
 //Check if user logged in otherwise redirect them to the login page.
 function restrict(req, res, next) {
   if (req.session.user) {
-    console.log(req.session.user);
     next();
   } else {
-    console.log("User not found");
-    next();
+      res.redirect('/LoginGateway');
   }
 }
 
