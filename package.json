@@ -21,6 +21,7 @@
     "bcrypt": "1.0.2",
     "body-parser": "^1.17.1",
     "express": "^4.14.1",
+    "express-fileupload": "^0.1.2",
     "express-session": "^1.15.2",
     "helmet": "^3.5.0",
     "mysql": "2.13.0"

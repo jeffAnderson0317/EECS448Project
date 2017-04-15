@@ -5,6 +5,7 @@ var mysql       = require('mysql');
 var bcrypt      = require('./js/bcrypt.js');
 var helmet      = require('helmet');
 var session     = require('express-session');
+var fileupload  = require('express-fileupload');
 
 //Set up the connection to the database
 var connection = mysql.createConnection({
@@ -26,10 +27,11 @@ app.use('/fonts', express.static(__dirname + '/fonts'));
 app.use(bodyParser.json());                                 //Support JSON-Encoded bodies
 app.use(bodyParser.urlencoded({extended: true}));           //Support URL-Encoded Bodies
 app.use(helmet());                                          //Protext app from well known vulerabilities (https://expressjs.com/en/advanced/best-practice-security.html)
+app.use(fileupload());
 app.use(session({
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  secret: 'shhhh, very secret'
+  secret: 'IFEIgTOnQZf4Y36F0Lu4gp4knE2IkY0x'
 }));
 
 //Session-persisted message middleware
@@ -46,32 +48,36 @@ app.use(function(req, res, next){
 
 //Get homepage and send it to whoever is requesting the page.
 app.get('/', restrict, function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "LocalBarMap.html");
-});
-
-//Get owner page and send it to whoever is requesting the page.
-app.get('/owner',function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "BarOwnerPage.html");
-});
-
-//Get user page and send it to whoever is requesting the page.
-app.get('/user',function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "userpage.html");
+    if (req.session.user.isOwner){
+        res.sendFile(__dirname + "/Pages/" + "BarOwnerPage.html");
+    }
+    else{
+        res.sendFile(__dirname + "/Pages/" + "LocalBarMap.html");
+    }
 });
 
 //Get login gateway and send it to whoever is requesting the page.
 app.get('/LoginGateway',function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "LoginPage.html");
+    if(req.session.user)
+        res.redirect('/');
+    else
+        res.sendFile(__dirname + "/Pages/" + "LoginPage.html");
 });
 
 //Get sign up page and send it to whoever is requesting the page.
 app.get('/SignUp',function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "SignUpPage.html");
+    if(req.session.user)
+        res.redirect('/');
+    else
+        res.sendFile(__dirname + "/Pages/" + "SignUpPage.html");
 });
 
 //Get login system and send it to whoever is requesting the page.
 app.get('/Login', function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "LoginSystem.html");
+    if(req.session.user)
+        res.redirect('/');
+    else
+        res.sendFile(__dirname + "/Pages/" + "LoginSystem.html");
 });
 
 app.get('/logout', function(req, res){
@@ -92,26 +98,31 @@ app.post('/auth', function(req, res){
             res.send('{"msg": "Error logging in.", "auth": "false"}');
         } 
         else {
-            bcrypt.comparePassword(password, results[0].password, function(err, isPasswordMatch){
-                if(err){
-                    res.send('{"isValid": "false"}');    
-                }
-                else if(isPasswordMatch){
-                    req.session.regenerate(function(){
-                        // Store the user's primary key
-                        // in the session store to be retrieved,
-                        // or in this case the entire user object
-                        req.session.user = results[0];
-                        req.session.success = 'Authenticated as ' + results[0].username
-                            + ' click to <a href="/logout">logout</a>. '
-                            + ' You may now access <a href="/restricted">/restricted</a>.';
-                        res.send('{"isValid": "true"}');
-                    });
-                }
-                else{
-                    res.send('{"isValid": "false"}');
-                }
-            });
+            if (results && results.length > 0){
+                bcrypt.comparePassword(password, results[0].password, function(err, isPasswordMatch){
+                    if(err){
+                        res.send('{"isValid": "false"}');    
+                    }
+                    else if(isPasswordMatch){
+                        req.session.regenerate(function(){
+                            // Store the user's primary key
+                            // in the session store to be retrieved,
+                            // or in this case the entire user object
+                            req.session.user = results[0];
+                            req.session.success = 'Authenticated as ' + results[0].username
+                                + ' click to <a href="/logout">logout</a>. '
+                                + ' You may now access <a href="/restricted">/restricted</a>.';
+                            res.send('{"isValid": "true"}');
+                        });
+                    }
+                    else{
+                        res.send('{"isValid": "false"}');
+                    }
+                });
+            }
+            else{
+                res.send('{"isValid": "false"}');
+            }
         }
     });
 });
@@ -120,13 +131,17 @@ app.post('/auth', function(req, res){
 app.post('/signup', function(req, res){
     var fields = req.body;
 
+    if(req.body.isOwner == "true")
+        req.body.isOwner = 1;
+    else
+        req.body.isOwner = 0;
+
     bcrypt.cryptPassword(fields.password, function(err, hash){
         if (err){
             res.send('{"msg": "Error signing up. Please contact j714a273@ku.edu for assistance.');
         }
         else{
             var user = {username: fields.username, firstname: fields.firstname, lastname: fields.lastname, age: fields.age, email: fields.email, password: hash, isOwner: fields.isOwner };
-
             connection.query("INSERT INTO BarUsers SET ?", user, function (error, results, fields) {
                 if (error){
                     if(error.code == "ER_DUP_ENTRY")
@@ -135,15 +150,29 @@ app.post('/signup', function(req, res){
                         res.send('{"msg": "Error connecting to database.", "isSignedUp": "false"}');
                 } 
                 else {
-                    req.session.regenerate(function(){
-                        // Store the user's primary key
-                        // in the session store to be retrieved,
-                        // or in this case the entire user object
-                        req.session.user = user;
-                        req.session.success = 'Authenticated as ' + user.username
-                            + ' click to <a href="/logout">logout</a>. '
-                            + ' You may now access <a href="/restricted">/restricted</a>.';
-                        res.send('{"msg": "Successfully signed up", "isSignedUp": "true"}');
+                    GetUserID(user.username, function(UserID){
+                        user.UserID = UserID;
+                        if (user.isOwner){
+                            var bar = { BarName: "", Location: "", Specials: "", Reviews: "", UserID: user.UserID };
+                            connection.query("INSERT INTO BarInfo SET ?", bar, function (error, results, fields) {
+                                if (error){
+                                    console.log(error);
+                                } 
+                                else {
+                                    console.log("Added to database succesfully.");
+                                }
+                            });
+                        }
+                        req.session.regenerate(function(){
+                            // Store the user's primary key
+                            // in the session store to be retrieved,
+                            // or in this case the entire user object
+                            req.session.user = user;
+                            req.session.success = 'Authenticated as ' + user.username
+                                + ' click to <a href="/logout">logout</a>. '
+                                + ' You may now access <a href="/restricted">/restricted</a>.';
+                            res.send('{"msg": "Successfully signed up", "isSignedUp": "true"}');
+                        });
                     });
                 }
             });
@@ -160,7 +189,62 @@ function restrict(req, res, next) {
   }
 }
 
-process.stdin.resume();//so the program will not close instantly
+app.post('/ownerGet', function(req,res){
+    connection.query("SELECT * FROM BarInfo WHERE UserID = ?", req.session.user.UserID, function (error, results, fields) {
+        if(results && results.length > 0){
+            results[0].ImageFile1 = results[0].ImageFile1.replace(__dirname, '');
+            results[0].ImageFile2 = results[0].ImageFile2.replace(__dirname, '');
+            res.send(JSON.stringify(results[0]));
+        }
+        else
+            res.send('{"msg": "Bar info not found!" }');
+    });
+});
+
+app.post('/ownerSubmit', function(req,res){
+    var imageFile1  = req.files.ImageFile1;
+    var imageFile2  = req.files.ImageFile2;
+    var user        = req.session.user;
+    var imgurl1 = __dirname + '/images/' + user.username + '-' + user.UserID + "-1.jpg";
+    var imgurl2 = __dirname + '/images/' + user.username + '-' + user.UserID + "-2.jpg";
+    var bar = { BarName: req.body.BarName, Location: req.body.Location, Specials: req.body.Specials, Reviews: req.body.Reviews, ImageFile1: imgurl1, ImageFile2: imgurl2, UserID: user.UserID };
+    if (imageFile1){
+        imageFile1.mv(imgurl1, function(err){
+            if(err)
+                console.log(err);
+            else
+                console.log("Succeeded");
+        });
+    }
+    if(imageFile2){
+        imageFile2.mv(imgurl2, function(err){
+            if(err)
+                console.log(err);
+            else
+                console.log("Succeeded");
+        });
+    }
+    connection.query("UPDATE BarInfo SET ?", bar, function (error, results, fields) {
+        if (error){
+            res.send('{"msg": "Error connecting to database.", "isUpdated": "false"}');
+        } 
+        else {
+            res.redirect('/');
+        }
+    });
+});
+
+function GetUserID(username,cb){
+    connection.query("SELECT UserID FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
+        if (error)
+            cb(0);
+        else
+            cb(results[0].UserID);
+    });
+}
+
+//so the program will not close instantly
+process.stdin.resume();
 
 function exitHandler(options, err) {
     connection.close();
@@ -169,7 +253,7 @@ function exitHandler(options, err) {
     if (options.exit) process.exit();
 }
 
-//do something when app is closing
+//Handle all connections and exit protocols on exit.
 process.on('exit', exitHandler.bind(null,{cleanup:true}));
 
 //catches ctrl+c event

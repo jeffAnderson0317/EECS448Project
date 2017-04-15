@@ -14,8 +14,8 @@
 	<script src="js/tether.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/signup.js"></script>
-
-	<div class="container-fluid">
+	<div class="col-md-2"></div>	
+	<div class="container-fluid col-md-8 signin-container">
 		
 		<form onsubmit="return SubmitForm()">
 	  <div class="form-group">
@@ -43,9 +43,8 @@
 	    <input type="password" class="form-control" id="password" placeholder="Password">
       </div>
 	  <div class="checkbox">
-	    <label>
-        Are you a bar owner? </label>
-	    <input type="checkbox">
+	    <label>Are you a bar owner?</label>
+	    <input id="owner" type="checkbox">
 	  </div>
 	  <button type="submit" class="btn btn-group-justified btn-block btn-lg">Create Account</button>
   </form>

@@ -23,7 +23,7 @@ function SubmitForm(){
             success: function (result) {
                     if (result.isSignedUp == "true"){
                         if(user.isOwner)
-                            window.location.assign('/owner');
+                            window.location.assign('/');
                         else{
                             window.location.assign('/')
                         }

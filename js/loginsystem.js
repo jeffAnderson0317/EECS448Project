@@ -5,12 +5,14 @@ function SubmitForm(){
     user.isOwner = $('#owner').is(':checked');
 
     if (user.username != ""){
+        var loader = document.getElementById("loader");
         $.ajax({
             url: "auth",
             type: "POST",
             data: user,
             dataType: "json",
             success: function (result) {
+                loader.className = "";
                 if(result.isValid == "true")
                     window.location.assign('/');
                 else
@@ -18,8 +20,10 @@ function SubmitForm(){
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert("Error when logging in.");
+                loader.className = "";
             }
         });
+        loader.className = "loader";
     }
     else{
         alert("Username and password fields were left blank.");

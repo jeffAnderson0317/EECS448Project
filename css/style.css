@@ -9,6 +9,15 @@ body *
 	font-size: 1.1em !important;
 }
 
+form{
+	background-color: aliceblue;
+	opacity: .9;
+	padding: 10px;
+	margin:auto;
+	border-radius: 10px;
+	font-weight: bold;
+}
+
 body {
 	background: url('/images/winery.jpg');
 	background-color: burlywood;
@@ -20,15 +29,6 @@ body {
 	overflow-x: auto; 
 	overflow-y: auto;
 	letter-spacing: .6em;
-}
-
-label{
-	background-color: aliceblue;
-	opacity: .9;
-	padding: 10px;
-	margin:auto;
-	border-radius: 10px;
-	font-weight: bold;
 }
 
 h1{
@@ -59,17 +59,37 @@ h1{
 	background-color: honeydew;
 }
 
-.help-block{
-	background-color: black;
-	color: antiquewhite;
-	opacity: .9;
-	width: 50%;
-	border-radius: 10px;
-	align-content: center;
-	font-weight: bolder;
+.login-container{
+	padding-top: 13%;
 }
 
-.jumbotron{
-	background-color: black;
-	opacity:.95;
+.owner-container{
+	padding-top: 2%;
+}
+
+.signin-container{
+	padding-top: 2%;
+}
+
+.loader {
+  	border: 16px solid #f3f3f3;
+  	border-radius: 50%;
+  	border-top: 16px solid black;
+  	width: 120px;
+  	height: 120px;
+  	-webkit-animation: spin 2s linear infinite;
+  	animation: spin 2s linear infinite;
+	position: absolute;
+    margin-left: 40%;
+    margin-top: 10%;
+}
+
+@-webkit-keyframes spin {
+  	0% { -webkit-transform: rotate(0deg); }
+  	100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  	0% { transform: rotate(0deg); }
+  	100% { transform: rotate(360deg); }
 }
