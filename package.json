@@ -24,6 +24,7 @@
     "express-fileupload": "^0.1.2",
     "express-session": "^1.15.2",
     "helmet": "^3.5.0",
-    "mysql": "2.13.0"
+    "mysql": "2.13.0",
+    "xmlhttprequest": "^1.8.0"
   }
 }
