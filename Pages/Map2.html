@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+		<meta charset="utf-8">
+		<title>Map</title>
+		<style>
+			#map {
+				height: 100%;
+			}
+			html, body {
+				height: 80%;
+				width: 80%;
+				margin: 10;
+				padding: 10;
+			}
+		</style>
+		<link href="css/bootstrap.css" rel="stylesheet">
+	</head>
+	<body>
+		<script src="js/jquery-1.11.3.min.js"></script>
+  		<script src="js/bootstrap.min.js"></script>
+  		<script src="js/js.cookie.js"></script>
+  		<script src="js/markerclusterer.js"></script>
+	
+		<div id="map"></div>
+		
+		<script src="js/map.js"></script>
+		<script async defer
+		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4fKXnBcXnH-ettsghc31PvF5LEerYU3c&callback=initMap">
+		</script>
+	</body>
+</html>

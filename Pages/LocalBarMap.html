@@ -6,28 +6,45 @@
 	  <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Homepage</title>
   	<link href="/css/bootstrap.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/css/map.css" rel="stylesheet" type="text/css">
   </head>
   <body>
+    <script src="/js/distance.js"></script>
+    <script src="/js/tether.min.js"></script>
     <script src="/js/jquery-1.11.3.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-   <!-- <script src="/js/homepage.js"></script> -->
-   <!-- http://stackoverflow.com/questions/18130568/how-to-use-google-maps-without-a-key-from-static-to-dynamic-with-url --> 	<div>
-  <iframe width="500" height="500" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?q=<?php echo urlencode($address); ?>&amp;output=embed"></iframe><br />
-  
-  <div class="container-fluid">
-  
-  <div class="container">
-  
-  <div class="col-md-6"><h2><span class="label label-warning">Bar Selected:</span></h2></div>
-  
-  <div class="col-md-6"><h2><span class="label label-info">Bar Name</span></h2>
-	  <h4><span class="label label-default">Location Here</span></h4></div>
-  </div>
-	  </br>
-	  <button type="submit" class="btn btn-group-justified btn-block btn-lg btn-primary">View Bar</button>
-  
-  </div>
-	  </div>
+    <script src="/js/js.cookie.js"></script>
+    <script src="/js/markerclusterer.js"></script>
+    <script src="/js/map.js"></script>
+    <script async defer
+		  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4fKXnBcXnH-ettsghc31PvF5LEerYU3c&callback=initMap">
+    </script>
+    <div class="col-md-2"></div>
+    <div id="map"></div>
+    <!-- <script src="/js/homepage.js"></script> -->
+    <!-- http://stackoverflow.com/questions/18130568/how-to-use-google-maps-without-a-key-from-static-to-dynamic-with-url -->
+    <div class="col-md-12">
+      <div class="col-md-2"></div>
+      <div class="col-md-8"><h2><span class="label label-warning">Bar Selected:</span></h2></div>
+      <div class="col-md-2"></div>
+    </div>
+
+    <div class="col-md-12">
+      <div class="col-md-2"></div>
+      <div class="col-md-8"><h2><span class="label label-info">Bar Name</span></h2></div>
+      <div class="col-md-2"></div>
+    </div>
+
+    <div class="col-md-12">
+      <div class="col-md-2"></div>
+      <div class="col-md-8"><h4><span class="label label-default">Location Here</span></h4></div>
+      <div class="col-md-2"></div>
+    </div>
+    </br>
+    <div class="col-md-12">
+      <div class="col-md-2"></div>
+      <div class="col-md-8"><button type="submit" class="btn btn-group-justified btn-block btn-lg btn-primary">View Bar</button></div>
+    </div>
   </body>
 </html>

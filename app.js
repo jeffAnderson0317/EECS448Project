@@ -1,11 +1,12 @@
-var express     = require("express");
-var app         = express();
-var bodyParser  = require("body-parser");
-var mysql       = require('mysql');
-var bcrypt      = require('./js/bcrypt.js');
-var helmet      = require('helmet');
-var session     = require('express-session');
-var fileupload  = require('express-fileupload');
+var express         = require("express");
+var app             = express();
+var bodyParser      = require("body-parser");
+var mysql           = require('mysql');
+var bcrypt          = require('./js/bcrypt.js');
+var helmet          = require('helmet');
+var session         = require('express-session');
+var fileupload      = require('express-fileupload');
+var XMLHttpRequest  = require("xmlhttprequest").XMLHttpRequest;
 
 //Set up the connection to the database
 var connection = mysql.createConnection({
@@ -205,32 +206,45 @@ app.post('/ownerSubmit', function(req,res){
     var imageFile1  = req.files.ImageFile1;
     var imageFile2  = req.files.ImageFile2;
     var user        = req.session.user;
-    var imgurl1 = __dirname + '/images/' + user.username + '-' + user.UserID + "-1.jpg";
-    var imgurl2 = __dirname + '/images/' + user.username + '-' + user.UserID + "-2.jpg";
-    var bar = { BarName: req.body.BarName, Location: req.body.Location, Specials: req.body.Specials, Reviews: req.body.Reviews, ImageFile1: imgurl1, ImageFile2: imgurl2, UserID: user.UserID };
-    if (imageFile1){
-        imageFile1.mv(imgurl1, function(err){
-            if(err)
-                console.log(err);
-            else
-                console.log("Succeeded");
-        });
-    }
-    if(imageFile2){
-        imageFile2.mv(imgurl2, function(err){
-            if(err)
-                console.log(err);
-            else
-                console.log("Succeeded");
-        });
-    }
-    connection.query("UPDATE BarInfo SET ?", bar, function (error, results, fields) {
-        if (error){
-            res.send('{"msg": "Error connecting to database.", "isUpdated": "false"}');
-        } 
-        else {
-            res.redirect('/');
+    var imgurl1     = '/images/' + user.username + '-' + user.UserID + "-1.jpg";
+    var imgurl2     = '/images/' + user.username + '-' + user.UserID + "-2.jpg";
+    var bar         = { BarName: req.body.BarName, Location: req.body.Location, Specials: req.body.Specials, Reviews: req.body.Reviews, ImageFile1: imgurl1, ImageFile2: imgurl2};
+    var xhttp       = new XMLHttpRequest();
+    var url         = "https://maps.googleapis.com/maps/api/geocode/json?address=" + req.body.Location.replace(' ','+') + "&key=AIzaSyAoiy3ECCrN9u0AxhksO_uYnAK9udLdO8o";
+
+    //Open the connection
+    xhttp.open("POST", url, true);    
+    //Set request header in order to get JSON response
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+
+    xhttp.send(); 
+    
+    //On response, call this function.
+    xhttp.onreadystatechange = function(){
+        if (this.readyState != 4) {
+            return;
         }
+
+        var data = JSON.parse(this.responseText);
+        CommitToDatabase(imageFile1, imageFile2, data, bar,user.UserID, res);
+    }
+});
+
+app.post('/getbars', function(req,res){
+    var latitude    = req.body.latitude;
+    var longitude   = req.body.longitude;
+    var lon1        = req.body.lon1;
+    var lon2        = req.body.lon2;
+    var lat1        = req.body.lat1;
+    var lat2        = req.body.lat2;
+
+    var query = "SELECT *, 3956 * 2 * ASIN(SQRT( POWER(SIN((? - bar.latitude) * pi()/180 / 2), 2) +COS(? * pi()/180) * COS(bar.latitude * pi()/180) *POWER(SIN((? - bar.longitude) * pi()/180 / 2), 2) )) as distance FROM BarInfo bar WHERE bar.longitude BETWEEN ? AND ? AND bar.latitude BETWEEN ? AND ? HAVING distance < 15";
+    connection.query(query, [latitude,latitude,longitude,lon1,lon2,lat1,lat2], function (error, results, fields) {
+        if(results && results.length > 0){
+            res.send(JSON.stringify(results));
+        }
+        else
+            res.send('{"msg": "Bars not found!" }');
     });
 });
 
@@ -240,6 +254,35 @@ function GetUserID(username,cb){
             cb(0);
         else
             cb(results[0].UserID);
+    });
+}
+
+function CommitToDatabase(imageFile1, imageFile2, data, bar, UserID, res){
+    bar.latitude    = data.results[0].geometry.location.lat;
+    bar.longitude   = data.results[0].geometry.location.lng;
+    if (imageFile1){
+        imageFile1.mv(__dirname + bar.ImageFile1, function(err){
+            if(err)
+                console.log(err);
+            else
+                console.log("Succeeded");
+        });
+    }
+    if(imageFile2){
+        imageFile2.mv(__dirname + bar.ImageFile2, function(err){
+            if(err)
+                console.log(err);
+            else
+                console.log("Succeeded");
+        });
+    }
+    connection.query("UPDATE BarInfo SET ? WHERE UserID = ?", [bar, UserID], function (error, results, fields) {
+        if (error){
+            res.send('{"msg": "Error connecting to database.", "isUpdated": "false"}');
+        } 
+        else {
+            res.redirect('/');
+        }
     });
 }
 

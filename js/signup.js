@@ -37,7 +37,8 @@ function SubmitForm(){
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert("Error signing up. Please contact j714a273@ku.edu for support (Server error).");
-            }});
+            }
+        });
     }
     else{
         alert("Required fields incorrectly filled out.");

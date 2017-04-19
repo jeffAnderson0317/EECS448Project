@@ -28,11 +28,9 @@ body {
 	background-blend-mode: luminosity;
 	overflow-x: auto; 
 	overflow-y: auto;
-	letter-spacing: .6em;
 }
 
 h1{
-	background-color: lavender;
 	opacity: .9;
 	padding: 10px;
 	margin:auto;
@@ -41,7 +39,6 @@ h1{
 }
 
 .checkbox{
-	background-color: lavender;
 	opacity: .9;
 	border-radius: 10px;
 	align-content: space-between;
@@ -87,6 +84,10 @@ h1{
 @-webkit-keyframes spin {
   	0% { -webkit-transform: rotate(0deg); }
   	100% { -webkit-transform: rotate(360deg); }
+}
+
+#map {
+	height: 100%;
 }
 
 @keyframes spin {
