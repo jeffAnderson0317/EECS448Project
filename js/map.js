@@ -50,6 +50,8 @@ function initMap() {
 
 function SetMarkers(results, myLatLng, map){
 
+    var wins = new google.maps.InfoWindow({map:map});
+
     for(var i = 0; i < results.length; i++){
         let position = { lat: results[i].latitude, lng: results[i].longitude };
 
@@ -66,8 +68,10 @@ function SetMarkers(results, myLatLng, map){
         '<div id="siteNotice">' +
         '</div>' +
         '<h1 id="firstHeading" class="firstHeading">' + results[i].BarName + '</h1>' +
-        '<h2>' + (parseFloat(Math.round(dist * 100) / 100).toFixed(2)) + ' miles away.</h2>'
-        '</div>';
+        '<h2>' + (parseFloat(Math.round(dist * 100) / 100).toFixed(2)) + ' miles away.</h2>' +
+        '<h3>' +
+	    '<input type="button" value="More Information" id="submit" onclick="viewSpecialsPage(' + results[i].UserID + ')\"/>'
+        '</h3></div>';
 
         var infowindow = new google.maps.InfoWindow({
             content: contentString
@@ -75,9 +79,12 @@ function SetMarkers(results, myLatLng, map){
         
         WindowBind(marker, map, infowindow, contentString, position);
     }
-    
-    var wins = new google.maps.InfoWindow({map:map});
 
+}
+
+function viewSpecialsPage(uid) {
+	document.cookie = "MoreInfoUserID=" + encodeURIComponent(uid) + ";";
+    window.location.assign('/MoreInfo');
 }
 
 function DegreesToRadians(degrees){

@@ -65,6 +65,14 @@ app.get('/LoginGateway',function(req,res){
         res.sendFile(__dirname + "/Pages/" + "LoginPage.html");
 });
 
+//Get login gateway and send it to whoever is requesting the page.
+app.get('/MoreInfo',function(req,res){
+    if(req.session.user)
+        res.sendFile(__dirname + "/Pages/" + "MoreInformation.html");
+    else
+        res.redirect('/');
+});
+
 //Get sign up page and send it to whoever is requesting the page.
 app.get('/SignUp',function(req,res){
     if(req.session.user)
@@ -226,8 +234,21 @@ app.post('/ownerSubmit', function(req,res){
         }
 
         var data = JSON.parse(this.responseText);
-        CommitToDatabase(imageFile1, imageFile2, data, bar,user.UserID, res);
+        CommitBarToDatabase(imageFile1, imageFile2, data, bar,user.UserID, res);
     }
+});
+
+app.post('/getBarInfo',function(req,res){
+    var localBars = req.session.localbars;
+    var notFound = true;
+    for(var i = 0; i < localBars.length; i++){
+        if (req.body.BarID == localBars[i].UserID){
+            res.send(localBars[i]);
+            notFound = false;
+        }
+    }
+    if (notFound)
+        res.send('{ "msg": "Bar not found, please contact j714a273@ku.edu for support." }');
 });
 
 app.post('/getbars', function(req,res){
@@ -237,11 +258,16 @@ app.post('/getbars', function(req,res){
     var lon2        = req.body.lon2;
     var lat1        = req.body.lat1;
     var lat2        = req.body.lat2;
+    var user        = req.session.user;
 
     var query = "SELECT *, 3956 * 2 * ASIN(SQRT( POWER(SIN((? - bar.latitude) * pi()/180 / 2), 2) +COS(? * pi()/180) * COS(bar.latitude * pi()/180) *POWER(SIN((? - bar.longitude) * pi()/180 / 2), 2) )) as distance FROM BarInfo bar WHERE bar.longitude BETWEEN ? AND ? AND bar.latitude BETWEEN ? AND ? HAVING distance < 15";
     connection.query(query, [latitude,latitude,longitude,lon1,lon2,lat1,lat2], function (error, results, fields) {
         if(results && results.length > 0){
-            res.send(JSON.stringify(results));
+            req.session.regenerate(function(){
+                req.session.localbars = results;
+                req.session.user = user;
+                res.send(JSON.stringify(results));
+            });
         }
         else
             res.send('{"msg": "Bars not found!" }');
@@ -257,7 +283,7 @@ function GetUserID(username,cb){
     });
 }
 
-function CommitToDatabase(imageFile1, imageFile2, data, bar, UserID, res){
+function CommitBarToDatabase(imageFile1, imageFile2, data, bar, UserID, res){
     bar.latitude    = data.results[0].geometry.location.lat;
     bar.longitude   = data.results[0].geometry.location.lng;
     if (imageFile1){
