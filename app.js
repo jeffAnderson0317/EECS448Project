@@ -316,7 +316,7 @@ function CommitBarToDatabase(imageFile1, imageFile2, data, bar, UserID, res){
 process.stdin.resume();
 
 function exitHandler(options, err) {
-    connection.close();
+    connection.end();
     if (options.cleanup) console.log('clean');
     if (err) console.log(err.stack);
     if (options.exit) process.exit();
