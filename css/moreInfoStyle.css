@@ -1,0 +1,24 @@
+h1.largecenter { 
+	font-size: 8vw; 
+	text-align: center; 
+}
+h1.info { 
+	font-size: 4vw; 
+	text-align: center; 
+	margin-left: 20vw; 
+	margin-right: 20vw; 
+}
+			
+h1 {
+	color: white; 
+}
+
+.outerDiv {
+	display: block; 
+	content: ''
+}
+
+.innerDiv {
+	margin-left: 5%; 
+	margin-right: 5%
+}

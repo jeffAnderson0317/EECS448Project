@@ -24,8 +24,8 @@ function writeData(name, loc, image1, image2, specials) {
 		document.getElementById("header1").innerHTML = name;
 	}
 	//If there are images stored, display them. Otherwise don't display anything. The images are set to be centered and have a width of 70% of the screen (updates as the window size is changed).
-	document.getElementById("image1").innerHTML = '<img src="' + image1 + '" style="display:block; margin: 0 auto; width: 70%" alt="">';
-	document.getElementById("image2").innerHTML = '<img src="' + image2 + '" style="display:block; margin: 0 auto; width: 70%" alt="">';
+	document.getElementById("image1").innerHTML = '<img src="' + image1 + '" style="display:block; margin: 0 auto; width: 50%" alt="">';
+	document.getElementById("image2").innerHTML = '<img src="' + image2 + '" style="display:block; margin: 0 auto; width: 50%" alt="">';
 	//If there are specials detected, display them. Otherwise, the default "Specials not found" will display
 	if(specials !== "") {
 		document.getElementById("specials").innerHTML = 'Specials: ' + specials;
