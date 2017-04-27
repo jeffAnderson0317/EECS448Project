@@ -37,9 +37,8 @@ function initMap() {
                 SetMarkers(results, myLatLng, map);
                 var coords = new google.maps.LatLng(latitude, longitude);
                 map.setCenter(coords);
-                map.panTo(coords);
-                wins.setPosition(coords);
-                wins.setContent('Location found');         
+                map.panTo(coords);  
+                SetCurrentLocationMarker(myLatLng, map, coords)  
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert("Error getting map. Please contact j714a273@ku.edu for support (Server error).");
@@ -48,9 +47,15 @@ function initMap() {
     }
 }
 
-function SetMarkers(results, myLatLng, map){
+function SetCurrentLocationMarker(myLatLng, map, coords){
+    var currentMarker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        title: 'Current Location'
+    });    
+}
 
-    var wins = new google.maps.InfoWindow({map:map});
+function SetMarkers(results, myLatLng, map){
 
     for(var i = 0; i < results.length; i++){
         let position = { lat: results[i].latitude, lng: results[i].longitude };
