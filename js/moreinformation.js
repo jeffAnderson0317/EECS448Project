@@ -53,15 +53,9 @@ function GetAndSetBarInfo(){
         success: function (result) {
             //Changes the html to display the data in the cookies
             writeData(result.BarName, result.Location, result.ImageFile1, result.ImageFile2, result.Specials);
-
-            //Deletes the cookies sent to this page
-            deleteCookie("MoreInfoUserID");
         },
         error: function (xhr, ajaxOptions, thrownError) {
             alert("Error get local bar information.");
-                    
-            //Deletes the cookies sent to this page
-            deleteCookie("MoreInfoUserID");
         }
     });
 }
