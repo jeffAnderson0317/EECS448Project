@@ -9,6 +9,11 @@
 		<link href="/css/style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
+  <script type="text/javascript">
+    function logout() {
+      window.location.assign('/logout');
+    }
+  </script>
 	<script src="/js/jquery-1.11.3.min.js"></script>
   <script src="/js/bootstrap.min.js"></script>
   <script src="/js/ownerpage.js"></script>
@@ -43,6 +48,7 @@
       <button type="submit" class="btn btn-group-justified btn-block btn-lg">Update Bar Information</button>
       
     </form>
+        <button type="submit" class="btn btn-group-justified btn-block btn-lg" onclick="logout()">Log out</button>
 </div>
 </body>
 </html>
