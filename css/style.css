@@ -8,6 +8,15 @@ body *
 	font-family: Jim Nightshade !important;
 }
 
+.bar-fav {
+    background-color: aliceblue;
+    opacity: .9;
+    padding: 10px;
+    margin: auto;
+    font-weight: bold;
+    border:1px solid black;
+}
+
 form{
 	background-color: aliceblue;
 	opacity: .9;

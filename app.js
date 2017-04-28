@@ -73,6 +73,10 @@ app.get('/MoreInfo',function(req,res){
         res.redirect('/');
 });
 
+app.get('/BarPage', function(req,res){
+    res.sendFile(__dirname + "/Pages/" + "BarPage.html");
+});
+
 //Get sign up page and send it to whoever is requesting the page.
 app.get('/SignUp',function(req,res){
     if(req.session.user)
@@ -251,6 +255,49 @@ app.post('/getBarInfo',function(req,res){
         res.send('{ "msg": "Bar not found, please contact j714a273@ku.edu for support." }');
 });
 
+app.post('/addFavorite', function(req,res){
+    var user = req.session.user;
+    var barID = req.body.BarID;
+    var query = "UPDATE BarUsers SET ? WHERE UserID = ?";
+
+    if (user.Favorites == ""){
+        user.Favorites = barID;
+    }
+    else if(!user.Favorites.includes(barID)){
+        user.Favorites += "," + barID;
+    }
+
+    connection.query(query, [user, user.UserID], function (error, results, fields) {
+        if (error){
+            res.send(' { "err": "Error adding favorite." } ');
+        }
+        else{
+            res.send(' { "msg": "Favorite added." } ');
+        }
+    });    
+});
+
+app.post('/removeFavorite', function(req,res){
+    var user = req.session.user;
+    var barID = req.body.BarID;
+
+    var favArr = user.Favorites.split(',');
+    var pos = favArr.indexOf(barID);
+    favArr.splice(pos,1);
+    user.Favorites = favArr.toString();
+
+    var query = "UPDATE BarUsers SET ? WHERE UserID = ?";
+
+    connection.query(query, [user, user.UserID], function (error, results, fields) {
+        if (error){
+            res.send(' { "err": "Error removing favorite." } ');
+        }
+        else{
+            res.send(' { "msg": "Favorite removed." } ');
+        }
+    });    
+});
+
 app.post('/getbars', function(req,res){
     var latitude    = req.body.latitude;
     var longitude   = req.body.longitude;
@@ -266,6 +313,7 @@ app.post('/getbars', function(req,res){
             req.session.regenerate(function(){
                 req.session.localbars = results;
                 req.session.user = user;
+                results.push(user.Favorites);
                 res.send(JSON.stringify(results));
             });
         }
