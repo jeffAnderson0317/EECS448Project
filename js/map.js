@@ -88,7 +88,7 @@ function SetMarkers(results, myLatLng, map){
         '<h2>' + (parseFloat(Math.round(dist * 100) / 100).toFixed(2)) + ' miles away.</h2>' +
         '<h3>' +
 	    '<input type="button" value="More Information" id="submit" onclick="viewSpecialsPage(' + results[i].UserID + ')\"/>';
-        if (favorites.includes(results[i].UserID)){
+        if (favorites != null && favorites.includes(results[i].UserID)){
             contentString += '<input type="button" value="Remove From Favorites" id="submit" class="Bar-' + results[i].UserID + '" onclick="RemoveFromFavorites(' + results[i].UserID + ',\'' + results[i].BarName + '\', \'' + spec + '\')\"/>';
             AddToFavoritesBar(results[i].UserID, results[i].BarName, spec);
         }
