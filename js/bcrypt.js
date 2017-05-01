@@ -1,5 +1,9 @@
+//Written and Debugged by: Jeff Anderson
+//Tested by: All project members
+
 var bcrypt = require('bcrypt');
 
+//Encrypt the password using bcrypt node js library.
 module.exports.cryptPassword = function(password, callback) {
    bcrypt.genSalt(10, function(err, salt) {
     if (err) 
@@ -12,6 +16,7 @@ module.exports.cryptPassword = function(password, callback) {
   });
 };
 
+//Compare the passwords using bcrypt node js library.
 module.exports.comparePassword = function(password, userPassword, callback) {
    bcrypt.compare(password, userPassword, function(err, isPasswordMatch) {
       if (err) 

@@ -1,3 +1,6 @@
+//Written and Debugged by: Jeff Anderson
+//Tested by: Everyone
+
 var express         = require("express");
 var app             = express();
 var bodyParser      = require("body-parser");
@@ -28,7 +31,7 @@ app.use('/fonts', express.static(__dirname + '/fonts'));
 app.use(bodyParser.json());                                 //Support JSON-Encoded bodies
 app.use(bodyParser.urlencoded({extended: true}));           //Support URL-Encoded Bodies
 app.use(helmet());                                          //Protext app from well known vulerabilities (https://expressjs.com/en/advanced/best-practice-security.html)
-app.use(fileupload());
+app.use(fileupload());                                      //Must use to allow bar owners to upload pictures.
 app.use(session({
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
@@ -73,10 +76,6 @@ app.get('/MoreInfo',function(req,res){
         res.redirect('/');
 });
 
-app.get('/BarPage', function(req,res){
-    res.sendFile(__dirname + "/Pages/" + "BarPage.html");
-});
-
 //Get sign up page and send it to whoever is requesting the page.
 app.get('/SignUp',function(req,res){
     if(req.session.user)
@@ -93,6 +92,8 @@ app.get('/Login', function(req,res){
         res.sendFile(__dirname + "/Pages/" + "LoginSystem.html");
 });
 
+//Log user out from their account, destroy their session,
+//and redirect them to the homepage.
 app.get('/logout', function(req, res){
   // destroy the user's session to log them out
   // will be re-created next request
@@ -106,6 +107,8 @@ app.post('/auth', function(req, res){
     var username = req.body.username;
     var password = req.body.password;
     
+    //Try to find user from database and authenticate user if username exists.
+    //Otherwise send back that there was an error logging the user in.
     connection.query("SELECT * FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
         if (error){
             res.send('{"msg": "Error logging in.", "auth": "false"}');
@@ -148,13 +151,15 @@ app.post('/signup', function(req, res){
         req.body.isOwner = 1;
     else
         req.body.isOwner = 0;
-
+    
+    //Encrypt the password to store into the database.
     bcrypt.cryptPassword(fields.password, function(err, hash){
         if (err){
             res.send('{"msg": "Error signing up. Please contact j714a273@ku.edu for assistance.');
         }
         else{
             var user = {username: fields.username, firstname: fields.firstname, lastname: fields.lastname, age: fields.age, email: fields.email, password: hash, isOwner: fields.isOwner };
+            //Insert user with encrypted password into the database.
             connection.query("INSERT INTO BarUsers SET ?", user, function (error, results, fields) {
                 if (error){
                     if(error.code == "ER_DUP_ENTRY")
@@ -163,6 +168,8 @@ app.post('/signup', function(req, res){
                         res.send('{"msg": "Error connecting to database.", "isSignedUp": "false"}');
                 } 
                 else {
+                    //Add UserID into user session object and if the user is a bar owner,
+                    //create a bar with their UserID into the BarInfo table.
                     GetUserID(user.username, function(UserID){
                         user.UserID = UserID;
                         if (user.isOwner){
@@ -172,7 +179,7 @@ app.post('/signup', function(req, res){
                                     console.log(error);
                                 } 
                                 else {
-                                    console.log("Added to database succesfully.");
+                                    console.log("Added to database successfully.");
                                 }
                             });
                         }
@@ -202,6 +209,7 @@ function restrict(req, res, next) {
   }
 }
 
+//Get all of the owner's bar information.
 app.post('/ownerGet', function(req,res){
     connection.query("SELECT * FROM BarInfo WHERE UserID = ?", req.session.user.UserID, function (error, results, fields) {
         if(results && results.length > 0){
@@ -214,6 +222,7 @@ app.post('/ownerGet', function(req,res){
     });
 });
 
+//Update owners bar information in the database.
 app.post('/ownerSubmit', function(req,res){
     var imageFile1  = req.files.ImageFile1;
     var imageFile2  = req.files.ImageFile2;
@@ -224,8 +233,9 @@ app.post('/ownerSubmit', function(req,res){
     var xhttp       = new XMLHttpRequest();
     var url         = "https://maps.googleapis.com/maps/api/geocode/json?address=" + req.body.Location.replace(' ','+') + "&key=AIzaSyAoiy3ECCrN9u0AxhksO_uYnAK9udLdO8o";
 
-    //Open the connection
+    //Open the connection in order to get bar's latitude and longitude
     xhttp.open("POST", url, true);    
+
     //Set request header in order to get JSON response
     xhttp.setRequestHeader('Content-Type', 'application/json');
 
@@ -236,12 +246,13 @@ app.post('/ownerSubmit', function(req,res){
         if (this.readyState != 4) {
             return;
         }
-
+        //Convert latitude and longitude into object and commit this bar to the database.
         var data = JSON.parse(this.responseText);
         CommitBarToDatabase(imageFile1, imageFile2, data, bar,user.UserID, res);
     }
 });
 
+//Get bar info for the BarInfo html page.
 app.post('/getBarInfo',function(req,res){
     var localBars = req.session.localbars;
     var notFound = true;
@@ -255,6 +266,7 @@ app.post('/getBarInfo',function(req,res){
         res.send('{ "msg": "Bar not found, please contact j714a273@ku.edu for support." }');
 });
 
+//Add bar as a favorite for the user.
 app.post('/addFavorite', function(req,res){
     var user = req.session.user;
     var barID = req.body.BarID;
@@ -277,6 +289,7 @@ app.post('/addFavorite', function(req,res){
     });    
 });
 
+//Remove bar from the user's favorites.
 app.post('/removeFavorite', function(req,res){
     var user = req.session.user;
     var barID = req.body.BarID;
@@ -298,6 +311,8 @@ app.post('/removeFavorite', function(req,res){
     });    
 });
 
+//Get all the bars within a certain distance using distance.js file and
+//query for finding bars within 15 miles. 
 app.post('/getbars', function(req,res){
     var latitude    = req.body.latitude;
     var longitude   = req.body.longitude;
@@ -322,6 +337,7 @@ app.post('/getbars', function(req,res){
     });
 });
 
+//Get the UserID given a username.
 function GetUserID(username,cb){
     connection.query("SELECT UserID FROM BarUsers WHERE username = ?", username, function (error, results, fields) {
         if (error)
@@ -331,6 +347,7 @@ function GetUserID(username,cb){
     });
 }
 
+//Update a bar in the database.
 function CommitBarToDatabase(imageFile1, imageFile2, data, bar, UserID, res){
     bar.latitude    = data.results[0].geometry.location.lat;
     bar.longitude   = data.results[0].geometry.location.lng;
@@ -363,6 +380,8 @@ function CommitBarToDatabase(imageFile1, imageFile2, data, bar, UserID, res){
 //so the program will not close instantly
 process.stdin.resume();
 
+//When the program is finished or stopped suddently
+//use this function to correctly close all connections.
 function exitHandler(options, err) {
     connection.end();
     if (options.cleanup) console.log('clean');
@@ -379,5 +398,5 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 //catches uncaught exceptions
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-//Get listen for any requests on port 3000.
+//Get listen for any requests on port 3000 or on the environment port is within.
 app.listen(process.env.PORT || 3000);

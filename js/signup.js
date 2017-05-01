@@ -1,3 +1,9 @@
+//Written and Debugged by: Jeff Anderson
+//Tested by: All project members
+
+//Checks for empty fields and throws alert if something is not filled out.
+//If there arent any fields and it infact has an email address, then create
+//the users account.
 function SubmitForm(){
     var user = {};
     user.username = $('#username').val();
@@ -47,6 +53,8 @@ function SubmitForm(){
     return false;
 }
 
+//Validate if an email is in fact an email and not a random set of characters.
+// Ex: Must be somecharacters@somecharacters.something.
 function validateEmail(email) {
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(email);

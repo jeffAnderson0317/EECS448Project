@@ -1,3 +1,8 @@
+//Written and Debugged by: Austin Clum, Jeff Anderson, and Lyndon Meadow
+//Tested by: All project members
+
+//Add a on click listener to each marker to open infowindow
+//and set the content for this infowindow.
 function WindowBind(marker, map, infowindow, html, pinloc) {
     marker.addListener('click', function() {
         infowindow.setContent(html);
@@ -7,8 +12,9 @@ function WindowBind(marker, map, infowindow, html, pinloc) {
     });
 }
 
+//Initialize the map. Gets all the bars within 15 miles
+//and creates markers on the maps for these bars.
 function initMap() {
-        
     window.navigator.geolocation.getCurrentPosition(show_map);
     
     function show_map(position,favorites) { 
@@ -47,6 +53,7 @@ function initMap() {
     }
 }
 
+//Attach your current location to the map as a regular marker.
 function SetCurrentLocationMarker(myLatLng, map, coords){
     var currentMarker = new google.maps.Marker({
         position: myLatLng,
@@ -55,6 +62,8 @@ function SetCurrentLocationMarker(myLatLng, map, coords){
     });    
 }
 
+//Set all bars as markers on the maps.
+//Also set the content for the infowindow for each marker.
 function SetMarkers(results, myLatLng, map){
     var favorites = results[results.length -1];
     for(var i = 0; i < results.length - 1; i++){
@@ -95,6 +104,7 @@ function SetMarkers(results, myLatLng, map){
     }
 }
 
+//Add the favorite to the favorites bar.
 function AddToFavoritesBar(bid, bname, specials){
     var html = '<div class="col-md-12"><div class="col-md-2"></div><div class="col-md-8 bar-fav bar-' + bid + '-fav">';
     html += '<div class="bar-name">' + bname + '</div>';
@@ -103,6 +113,8 @@ function AddToFavoritesBar(bid, bname, specials){
     $('.favorites').append(html);
 }
 
+//Add the favorite to the users favorites in the database
+//and then add it to the favorites bar.
 function AddToFavorites(bid, bname, specials){
     var favorite = { BarID: bid };
     $.ajax({
@@ -129,6 +141,8 @@ function AddToFavorites(bid, bname, specials){
     });
 }
 
+//Remove the favorite from the users favorites in the database
+//and then remove it to the favorites bar.
 function RemoveFromFavorites(bid, bname, specials){
     var favorite = { BarID: bid };
     $.ajax({
@@ -154,11 +168,14 @@ function RemoveFromFavorites(bid, bname, specials){
     });
 }
 
+//When a user clicks for more information about the
+//specific bar, redirect them to the moreinfo page.
 function viewSpecialsPage(uid) {
 	document.cookie = "MoreInfoUserID=" + encodeURIComponent(uid) + ";";
     window.location.assign('/MoreInfo');
 }
 
+//Convert from degrees to radians for latitudes and longitudes.
 function DegreesToRadians(degrees){
     return (Math.PI * degrees) / 180;
 }

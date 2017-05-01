@@ -1,4 +1,7 @@
+//Written and Debugged by: Jeff Anderson
+//Tested by: All project members
 
+//Get all the information for the owners bar display it in the form.
 $.ajax({
     url: "ownerGet",
     type: "POST",

@@ -1,3 +1,7 @@
+//Written and Debugged by: Jeff Anderson
+//Tested by: All project members
+//Submits the information to the server to check
+//if the user is in the database and authenticate the password.
 function SubmitForm(){
     var user = {};
     user.username = $('#username').val();
